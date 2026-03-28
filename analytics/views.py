@@ -11,9 +11,6 @@ from .serializers import (
     ClusteringResultSerializer,
     PredictionResultSerializer
 )
-from ml_models.clustering import perform_clustering
-from ml_models.prediction import predict_next_month, predict_next_week
-from ml_models.preprocessing import prepare_expense_data
 
 User = get_user_model()
 
@@ -38,6 +35,9 @@ class AnalyticsViewSet(viewsets.ViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
+            from ml_models.preprocessing import prepare_expense_data
+            from ml_models.clustering import perform_clustering
+
             # Prepare data
             X, expense_ids = prepare_expense_data(expenses)
             
@@ -79,6 +79,10 @@ class AnalyticsViewSet(viewsets.ViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
+            from ml_models.preprocessing import prepare_expense_data
+            from ml_models.prediction import predict_next_month, predict_next_week
+            from sklearn.linear_model import LinearRegression
+
             # Prepare data
             X, y = prepare_expense_data(expenses, for_prediction=True)
             
@@ -87,7 +91,6 @@ class AnalyticsViewSet(viewsets.ViewSet):
             next_week = predict_next_week(X, y)
             
             # Calculate confidence (R-squared)
-            from sklearn.linear_model import LinearRegression
             model = LinearRegression()
             model.fit(X, y)
             confidence = model.score(X, y)
